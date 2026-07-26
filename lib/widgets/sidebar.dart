@@ -66,10 +66,9 @@ class Sidebar extends StatelessWidget {
 
                 _menu(Icons.badge, "Field Officers"),
 
-                _menu(Icons.money, "Loans"),
+                _menu(Icons.money, "Guarantors"),
 
-                _menu(Icons.payment, "Payments"),
-
+                // _menu(Icons.payment, "Payments"),
                 _menu(Icons.bar_chart, "Reports"),
 
                 _menu(Icons.settings, "Settings"),
@@ -88,22 +87,6 @@ class Sidebar extends StatelessWidget {
       ),
     );
   }
-
-  // Widget _menu(IconData icon, String title) {
-  //   return ListTile(
-  //     leading: Icon(icon, color: AppColors.primaryBlue),
-
-  //     title: collapsed
-  //         ? null
-  //         : Text(title, style: const TextStyle(fontWeight: FontWeight.w500)),
-
-  //     hoverColor: AppColors.background,
-
-  //     onTap: () {
-  //       onMenuSelected(title);
-  //     },
-  //   );
-  // }
 
   Widget _menu(IconData icon, String title) {
     return Material(

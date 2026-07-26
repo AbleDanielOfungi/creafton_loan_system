@@ -1,90 +1,3 @@
-// import 'package:creafton_financial_services/screens/borrowers/borrower.dart';
-
-// import '../database/database_helper.dart';
-
-// class BorrowerRepository {
-//   Future<int> create(Borrower borrower) async {
-//     final db = await DatabaseHelper.database;
-
-//     return await db.insert("borrowers", borrower.toMap());
-//   }
-
-//   Future<List<Borrower>> getAll() async {
-//     final db = await DatabaseHelper.database;
-
-//     try {
-//       final result = await db.query("borrowers", orderBy: "id DESC");
-
-//       return result.map((e) => Borrower.fromMap(e)).toList();
-//     } catch (e, stackTrace) {
-//       print("=================================");
-//       print("BorrowerRepository ERROR:");
-//       print(e);
-//       print(stackTrace);
-//       print("=================================");
-//       rethrow;
-//     }
-//   }
-
-//   Future<List<Borrower>> search(String keyword) async {
-//     final db = await DatabaseHelper.database;
-
-//     final result = await db.query(
-//       "borrowers",
-
-//       where: """
-// full_name LIKE ?
-// OR phone LIKE ?
-// OR borrower_number LIKE ?
-
-// """,
-
-//       whereArgs: ["%$keyword%", "%$keyword%", "%$keyword%"],
-//     );
-
-//     return result.map((e) => Borrower.fromMap(e)).toList();
-//   }
-
-//   Future<void> delete(int id) async {
-//     final db = await DatabaseHelper.database;
-
-//     await db.delete("borrowers", where: "id=?", whereArgs: [id]);
-//   }
-
-//   // ======================================
-// // UPDATE
-// // ======================================
-
-// Future<int> update(Borrower borrower) async {
-//   final db = await DatabaseHelper.database;
-
-//   return await db.update(
-//     "borrowers",
-//     borrower.toMap(),
-//     where: "id=?",
-//     whereArgs: [borrower.id],
-//   );
-// }
-
-// // ======================================
-// // GET BY ID
-// // ======================================
-
-// Future<Borrower?> getById(int id) async {
-//   final db = await DatabaseHelper.database;
-
-//   final result = await db.query(
-//     "borrowers",
-//     where: "id=?",
-//     whereArgs: [id],
-//     limit: 1,
-//   );
-
-//   if (result.isEmpty) return null;
-
-//   return Borrower.fromMap(result.first);
-// }
-// }
 
 import 'package:creafton_financial_services/screens/borrowers/borrower.dart';
 
@@ -182,4 +95,47 @@ OR national_id LIKE ?
 
     await db.delete("borrowers", where: "id=?", whereArgs: [id]);
   }
+
+  // =====================================================
+// SEARCH BORROWERS
+// =====================================================
+
+Future<List<Borrower>> searchBorrowers(String keyword) async {
+
+  final db = await DatabaseHelper.database;
+
+
+  final result = await db.query(
+    'borrowers',
+
+    where: '''
+    full_name LIKE ?
+    OR borrower_number LIKE ?
+    OR phone LIKE ?
+    OR national_id LIKE ?
+    ''',
+
+    whereArgs: [
+
+      "%$keyword%",
+
+      "%$keyword%",
+
+      "%$keyword%",
+
+      "%$keyword%",
+
+    ],
+
+    orderBy: 'id DESC',
+  );
+
+
+  return result
+      .map(
+        (row)=>Borrower.fromMap(row),
+      )
+      .toList();
+
+}
 }

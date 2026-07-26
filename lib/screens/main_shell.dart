@@ -1,3 +1,6 @@
+import 'package:creafton_financial_services/screens/field%20offficers/field_officers_screen.dart';
+import 'package:creafton_financial_services/screens/guarantors/main_guarantor_screen.dart';
+// import 'package:creafton_financial_services/screens/guarantors/main_guarantors_screen.dart';
 import 'package:flutter/material.dart';
 
 import '../screens/dashboard/dashboard_screen.dart';
@@ -32,17 +35,23 @@ class _MainShellState extends State<MainShell> {
           break;
 
         case "Field Officers":
-          _selectedPage = const Center(child: Text("Field Officers Module"));
+          // _selectedPage = const Center(child: Text("Field Officers Module"));
+          _selectedPage = const FieldOfficersScreen();
 
           break;
 
-        case "Loans":
-          _selectedPage = const Center(child: Text("Loans Module"));
+        case "Guarantors":
+          _selectedPage = const GuarantorsScreen();
 
           break;
 
-        case "Payments":
-          _selectedPage = const Center(child: Text("Payments Module"));
+          // case "Loans":
+          // _selectedPage = const Center(child: Text("Loans Module"));
+
+          // break;
+
+          // case "Payments":
+          //   _selectedPage = const Center(child: Text("Payments Module"));
 
           break;
 
