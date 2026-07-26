@@ -165,6 +165,27 @@ class _BorrowersScreenState extends State<BorrowersScreen> {
     );
   }
 
+  //   //search borrower
+  //   void filterBorrowers(String value) {
+
+  //   final provider =
+  //       Provider.of<BorrowerProvider>(
+  //         context,
+  //         listen: false,
+  //       );
+
+  //   if (value.trim().isEmpty) {
+
+  //     provider.loadBorrowers();
+
+  //     return;
+
+  //   }
+
+  //   provider.filterBorrowers(value.trim());
+
+  // }
+
   //delete borrower dialog
 
   Future<void> _showDeleteDialog(Borrower borrower) async {
@@ -283,25 +304,68 @@ class _BorrowersScreenState extends State<BorrowersScreen> {
     );
   }
 
+  // Widget _search() {
+  //   return TextField(
+  //     controller: searchController,
+
+  //     decoration: InputDecoration(
+  //       hintText: "Search borrower by name, phone or ID",
+
+  //       prefixIcon: const Icon(Icons.search),
+
+  //       filled: true,
+
+  //       fillColor: Colors.white,
+
+  //       border: OutlineInputBorder(
+  //         borderRadius: BorderRadius.circular(12),
+
+  //         borderSide: BorderSide.none,
+  //       ),
+  //     ),
+  //   );
+  // }
   Widget _search() {
-    return TextField(
-      controller: searchController,
+    return Consumer<BorrowerProvider>(
+      builder: (context, provider, _) {
+        return TextField(
+          controller: searchController,
 
-      decoration: InputDecoration(
-        hintText: "Search borrower by name, phone or ID",
+          decoration: InputDecoration(
+            hintText: "Search borrower by name, phone or ID",
 
-        prefixIcon: const Icon(Icons.search),
+            prefixIcon: const Icon(Icons.search),
 
-        filled: true,
+            filled: true,
 
-        fillColor: Colors.white,
+            fillColor: Colors.white,
 
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12),
+            suffixIcon: searchController.text.isNotEmpty
+                ? IconButton(
+                    icon: const Icon(Icons.clear),
 
-          borderSide: BorderSide.none,
-        ),
-      ),
+                    onPressed: () {
+                      searchController.clear();
+
+                      provider.clearSearch();
+                    },
+                  )
+                : null,
+
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+
+              borderSide: BorderSide.none,
+            ),
+          ),
+
+          onChanged: (value) {
+            provider.searchBorrowers(value);
+
+            setState(() {});
+          },
+        );
+      },
     );
   }
 
@@ -312,8 +376,8 @@ class _BorrowersScreenState extends State<BorrowersScreen> {
           return const Center(child: CircularProgressIndicator());
         }
 
-        if (provider.borrowers.isEmpty) {
-          return const Center(child: Text("No borrowers registered"));
+        if (provider.filteredBorrowers.isEmpty) {
+          return const Center(child: Text("No borrowers found"));
         }
 
         return Container(
@@ -340,7 +404,8 @@ class _BorrowersScreenState extends State<BorrowersScreen> {
               DataColumn(label: Text("Actions")),
             ],
 
-            rows: provider.borrowers.map((borrower) {
+            // rows: provider.borrowers.map((borrower) {
+            rows: provider.filteredBorrowers.map((borrower) {
               return DataRow(
                 cells: [
                   DataCell(Text(borrower.borrowerNumber)),

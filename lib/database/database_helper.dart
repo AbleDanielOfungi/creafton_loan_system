@@ -456,38 +456,39 @@ ON DELETE CASCADE
 
     await db.execute('''
 
-CREATE TABLE field_officer_performance(
+CREATE TABLE field_officer_performance (
 
-id INTEGER PRIMARY KEY AUTOINCREMENT,
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
 
+    field_officer_id INTEGER UNIQUE NOT NULL,
 
-field_officer_id INTEGER UNIQUE,
+    total_assigned INTEGER DEFAULT 0,
 
+    active_loans INTEGER DEFAULT 0,
 
-total_assigned INTEGER DEFAULT 0,
+    completed_loans INTEGER DEFAULT 0,
 
+    overdue_loans INTEGER DEFAULT 0,
 
-active_loans INTEGER DEFAULT 0,
+    total_collected REAL DEFAULT 0,
 
+    monthly_collected REAL DEFAULT 0,
 
-total_collected REAL DEFAULT 0,
+    today_collected REAL DEFAULT 0,
 
+    portfolio_amount REAL DEFAULT 0,
 
-outstanding_amount REAL DEFAULT 0,
+    outstanding_amount REAL DEFAULT 0,
 
+    recovery_rate REAL DEFAULT 0,
 
-recovery_rate REAL DEFAULT 0,
+    performance_score REAL DEFAULT 0,
 
+    last_updated TEXT,
 
-last_updated TEXT,
-
-
-
-FOREIGN KEY(field_officer_id)
-
-REFERENCES field_officers(id)
-
-ON DELETE CASCADE
+    FOREIGN KEY(field_officer_id)
+        REFERENCES field_officers(id)
+        ON DELETE CASCADE
 
 )
 

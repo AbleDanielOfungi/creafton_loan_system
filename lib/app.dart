@@ -1,4 +1,6 @@
 import 'package:creafton_financial_services/providers/borrower_statistics_provider.dart';
+import 'package:creafton_financial_services/providers/field_officer_provider.dart';
+import 'package:creafton_financial_services/providers/guarantor_provider.dart';
 import 'package:creafton_financial_services/providers/loan_payment_details_provider.dart';
 import 'package:creafton_financial_services/providers/loan_provider.dart';
 import 'package:creafton_financial_services/providers/payment_provder.dart';
@@ -30,8 +32,10 @@ class CreaftonApp extends StatelessWidget {
 
         ChangeNotifierProvider(create: (_) => LoanProvider()),
         ChangeNotifierProvider(create: (_) => LoanPaymentDetailsProvider()),
+        ChangeNotifierProvider(create: (_) => FieldOfficerProvider()),
 
         ChangeNotifierProvider(create: (_) => PaymentScheduleProvider()),
+        ChangeNotifierProvider(create: (_) => GuarantorProvider()),
       ],
 
       child: MaterialApp(
