@@ -452,6 +452,67 @@ ON DELETE CASCADE
 
 ''');
 
+
+await db.execute('''
+
+CREATE TABLE expenditure_categories(
+
+id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+name TEXT UNIQUE NOT NULL,
+
+description TEXT,
+
+created_at TEXT
+
+)
+
+''');
+
+
+await db.execute('''
+
+CREATE TABLE expenditures(
+
+id INTEGER PRIMARY KEY AUTOINCREMENT,
+
+
+category_id INTEGER NOT NULL,
+
+
+title TEXT NOT NULL,
+
+
+amount REAL NOT NULL,
+
+
+payment_method TEXT,
+
+
+reference_number TEXT,
+
+
+description TEXT,
+
+
+expense_date TEXT NOT NULL,
+
+
+created_by INTEGER,
+
+
+created_at TEXT,
+
+
+
+FOREIGN KEY(category_id)
+
+REFERENCES expenditure_categories(id)
+
+)
+
+''');
+
     // FIELD OFFICER PERFORMANCE
 
     await db.execute('''

@@ -68,7 +68,8 @@ class Sidebar extends StatelessWidget {
 
                 _menu(Icons.money, "Guarantors"),
 
-                // _menu(Icons.payment, "Payments"),
+                _menu(Icons.payment, "Expenditures"),
+                _menu(Icons.payment, "Expenditures Reports"),
                 _menu(Icons.bar_chart, "Reports"),
 
                 _menu(Icons.settings, "Settings"),
