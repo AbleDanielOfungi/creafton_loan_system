@@ -5,276 +5,847 @@ import '../../models/expenditure.dart';
 import '../../providers/expenditure_provider.dart';
 import '../../providers/expenditure_category_provider.dart';
 
+
 class EditExpenditureScreen extends StatefulWidget {
+
   final Expenditure expenditure;
 
-  const EditExpenditureScreen({super.key, required this.expenditure});
+
+  const EditExpenditureScreen({
+    super.key,
+    required this.expenditure,
+  });
+
 
   @override
-  State<EditExpenditureScreen> createState() => _EditExpenditureScreenState();
+  State<EditExpenditureScreen> createState() =>
+      _EditExpenditureScreenState();
+
 }
 
-class _EditExpenditureScreenState extends State<EditExpenditureScreen> {
-  final formKey = GlobalKey<FormState>();
 
-  late TextEditingController title;
 
-  late TextEditingController amount;
+class _EditExpenditureScreenState
+    extends State<EditExpenditureScreen> {
 
-  late TextEditingController reference;
 
-  late TextEditingController description;
+  final formKey =
+      GlobalKey<FormState>();
+
+
+  late TextEditingController titleController;
+
+  late TextEditingController amountController;
+
+  late TextEditingController referenceController;
+
+  late TextEditingController descriptionController;
+
+
 
   late int categoryId;
 
+
   String? paymentMethod;
+
 
   late DateTime expenseDate;
 
-  bool saving = false;
+
+  bool saving=false;
+
+
 
   @override
-  void initState() {
+  void initState(){
+
     super.initState();
 
-    final e = widget.expenditure;
 
-    title = TextEditingController(text: e.title);
+    final expense =
+        widget.expenditure;
 
-    amount = TextEditingController(text: e.amount.toString());
 
-    reference = TextEditingController(text: e.referenceNumber ?? "");
+    titleController =
+        TextEditingController(
+          text: expense.title,
+        );
 
-    description = TextEditingController(text: e.description ?? "");
 
-    categoryId = e.categoryId;
+    amountController =
+        TextEditingController(
+          text: expense.amount.toStringAsFixed(0),
+        );
 
-    paymentMethod = e.paymentMethod;
 
-    expenseDate = DateTime.parse(e.expenseDate);
+    referenceController =
+        TextEditingController(
+          text: expense.referenceNumber ?? "",
+        );
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<ExpenditureCategoryProvider>().loadCategories();
+
+    descriptionController =
+        TextEditingController(
+          text: expense.description ?? "",
+        );
+
+
+    categoryId =
+        expense.categoryId;
+
+
+    paymentMethod =
+        expense.paymentMethod;
+
+
+    expenseDate =
+        DateTime.parse(
+          expense.expenseDate,
+        );
+
+
+
+    WidgetsBinding.instance
+        .addPostFrameCallback((_){
+
+      context
+          .read<ExpenditureCategoryProvider>()
+          .loadCategories();
+
     });
+
+
   }
 
+
+
+
   @override
-  void dispose() {
-    title.dispose();
+  void dispose(){
 
-    amount.dispose();
+    titleController.dispose();
 
-    reference.dispose();
+    amountController.dispose();
 
-    description.dispose();
+    referenceController.dispose();
+
+    descriptionController.dispose();
 
     super.dispose();
+
   }
 
-  Future<void> save() async {
-    if (!formKey.currentState!.validate()) return;
 
-    setState(() {
-      saving = true;
-    });
 
-    final updated = widget.expenditure.copyWith(
-      categoryId: categoryId,
 
-      title: title.text.trim(),
+  Future<void> update() async{
 
-      amount: double.parse(amount.text),
 
-      paymentMethod: paymentMethod,
-
-      referenceNumber: reference.text.trim(),
-
-      description: description.text.trim(),
-
-      expenseDate: expenseDate.toIso8601String().substring(0, 10),
-    );
-
-    final success = await context.read<ExpenditureProvider>().updateExpenditure(
-      updated,
-    );
-
-    if (!mounted) return;
-
-    if (success) {
-      Navigator.pop(context);
+    if(!formKey.currentState!.validate()){
+      return;
     }
 
+
     setState(() {
-      saving = false;
+
+      saving=true;
+
     });
-  }
 
-  Widget field(String label, TextEditingController controller) {
-    return TextFormField(
-      controller: controller,
 
-      validator: (value) {
-        if (value == null || value.trim().isEmpty) {
-          return "$label required";
-        }
 
-        return null;
-      },
+    try{
 
-      decoration: InputDecoration(
-        labelText: label,
 
-        border: const OutlineInputBorder(),
-      ),
-    );
-  }
+      final updated =
+      widget.expenditure.copyWith(
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Edit Expenditure")),
 
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
+        categoryId:
+        categoryId,
 
-        child: Form(
-          key: formKey,
 
-          child: Column(
-            children: [
-              Consumer<ExpenditureCategoryProvider>(
-                builder: (context, provider, _) {
-                  return DropdownButtonFormField<int>(
-                    value: categoryId,
+        title:
+        titleController.text.trim(),
 
-                    decoration: const InputDecoration(
-                      labelText: "Category",
 
-                      border: OutlineInputBorder(),
-                    ),
+        amount:
+        double.parse(
+          amountController.text.replaceAll(",", ""),
+        ),
 
-                    items: provider.categories
-                        .map(
-                          (c) => DropdownMenuItem(
-                            value: c.id,
 
-                            child: Text(c.name),
-                          ),
-                        )
-                        .toList(),
+        paymentMethod:
+        paymentMethod,
 
-                    onChanged: (value) {
-                      setState(() {
-                        categoryId = value!;
-                      });
-                    },
-                  );
-                },
-              ),
 
-              const SizedBox(height: 16),
+        referenceNumber:
+        referenceController.text.trim(),
 
-              field("Title", title),
 
-              const SizedBox(height: 16),
+        description:
+        descriptionController.text.trim(),
 
-              TextFormField(
-                controller: amount,
 
-                keyboardType: TextInputType.number,
+        expenseDate:
+        expenseDate
+            .toIso8601String()
+            .substring(0,10),
 
-                decoration: const InputDecoration(
-                  labelText: "Amount",
 
-                  border: OutlineInputBorder(),
-                ),
-              ),
+      );
 
-              const SizedBox(height: 16),
 
-              DropdownButtonFormField<String>(
-                value: paymentMethod,
 
-                decoration: const InputDecoration(
-                  labelText: "Payment Method",
+      final success =
+      await context
+          .read<ExpenditureProvider>()
+          .updateExpenditure(
+          updated
+      );
 
-                  border: OutlineInputBorder(),
-                ),
 
-                items: ["Cash", "Mobile Money", "Bank"]
-                    .map((e) => DropdownMenuItem(value: e, child: Text(e)))
-                    .toList(),
 
-                onChanged: (v) {
-                  setState(() {
-                    paymentMethod = v;
-                  });
-                },
-              ),
+      if(!mounted)return;
 
-              const SizedBox(height: 16),
 
-              field("Reference", reference),
 
-              const SizedBox(height: 16),
+      if(success){
 
-              ListTile(
-                title: Text("Date: ${expenseDate.toString().substring(0, 10)}"),
 
-                leading: const Icon(Icons.calendar_month),
+        ScaffoldMessenger.of(context)
+            .showSnackBar(
 
-                onTap: () async {
-                  final d = await showDatePicker(
-                    context: context,
+          const SnackBar(
 
-                    firstDate: DateTime(2020),
+            content:
+            Text(
+                "Expenditure updated successfully"
+            ),
 
-                    lastDate: DateTime(2100),
+          ),
 
-                    initialDate: expenseDate,
-                  );
+        );
 
-                  if (d != null) {
-                    setState(() {
-                      expenseDate = d;
-                    });
-                  }
-                },
-              ),
 
-              const SizedBox(height: 16),
+        Navigator.pop(context);
 
-              TextFormField(
-                controller: description,
 
-                maxLines: 3,
+      }
 
-                decoration: const InputDecoration(
-                  labelText: "Description",
 
-                  border: OutlineInputBorder(),
-                ),
-              ),
 
-              const SizedBox(height: 30),
+    }
+    catch(e){
 
-              SizedBox(
-                width: double.infinity,
 
-                height: 50,
+      ScaffoldMessenger.of(context)
+          .showSnackBar(
 
-                child: ElevatedButton(
-                  onPressed: saving ? null : save,
-
-                  child: saving
-                      ? const CircularProgressIndicator()
-                      : const Text("UPDATE EXPENDITURE"),
-                ),
-              ),
-            ],
+        SnackBar(
+          content:
+          Text(
+              e.toString()
           ),
         ),
-      ),
-    );
+
+      );
+
+
+    }
+    finally{
+
+
+      if(mounted){
+
+        setState(() {
+
+          saving=false;
+
+        });
+
+      }
+
+
+    }
+
+
+
   }
+
+
+
+
+
+
+
+  Widget inputField({
+
+    required String label,
+
+    required TextEditingController controller,
+
+    required IconData icon,
+
+    TextInputType type =
+    TextInputType.text,
+
+
+    int maxLines=1,
+
+  }){
+
+
+    return TextFormField(
+
+      controller:
+      controller,
+
+
+      keyboardType:
+      type,
+
+
+      maxLines:
+      maxLines,
+
+
+      validator:(value){
+
+
+        if(value==null ||
+            value.trim().isEmpty){
+
+          return "$label required";
+
+        }
+
+
+        return null;
+
+
+      },
+
+
+      decoration:
+      InputDecoration(
+
+        labelText:
+        label,
+
+
+        prefixIcon:
+        Icon(icon),
+
+
+        border:
+        OutlineInputBorder(
+
+          borderRadius:
+          BorderRadius.circular(12),
+
+        ),
+
+      ),
+
+    );
+
+
+  }
+
+
+
+
+
+
+
+  @override
+  Widget build(BuildContext context){
+
+
+    return Scaffold(
+
+
+      appBar:
+      AppBar(
+
+        title:
+        const Text(
+            "Edit Expenditure"
+        ),
+
+      ),
+
+
+
+
+
+      body:
+      SingleChildScrollView(
+
+
+        padding:
+        const EdgeInsets.all(20),
+
+
+
+        child:
+        Form(
+
+
+          key:
+          formKey,
+
+
+
+          child:
+          Column(
+
+            children:[
+
+
+
+              Consumer<ExpenditureCategoryProvider>(
+
+                builder:
+                (context,provider,_){
+
+
+                  return DropdownButtonFormField<int>(
+
+
+                    value:
+                    categoryId,
+
+
+                    decoration:
+                    InputDecoration(
+
+
+                      labelText:
+                      "Expense Category",
+
+
+                      prefixIcon:
+                      const Icon(
+                          Icons.category
+                      ),
+
+
+                      border:
+                      OutlineInputBorder(
+
+                        borderRadius:
+                        BorderRadius.circular(12),
+
+                      ),
+
+                    ),
+
+
+
+                    items:
+
+                    provider.categories
+                        .map(
+
+                            (category)=>DropdownMenuItem<int>(
+
+                          value:
+                          category.id,
+
+
+                          child:
+                          Text(
+                              category.name
+                          ),
+
+
+                        )
+
+                    )
+                        .toList(),
+
+
+
+                    onChanged:(value){
+
+                      setState(() {
+
+                        categoryId=value!;
+
+                      });
+
+                    },
+
+                  );
+
+
+                },
+
+              ),
+
+
+
+              const SizedBox(height:18),
+
+
+
+
+              inputField(
+
+                label:
+                "Expense Title",
+
+                controller:
+                titleController,
+
+                icon:
+                Icons.title,
+
+              ),
+
+
+
+
+              const SizedBox(height:18),
+
+
+
+
+
+              inputField(
+
+                label:
+                "Amount (UGX)",
+
+                controller:
+                amountController,
+
+                icon:
+                Icons.money,
+
+                type:
+                TextInputType.number,
+
+              ),
+
+
+
+
+              const SizedBox(height:18),
+
+
+
+
+
+              DropdownButtonFormField<String>(
+
+
+                value:
+                paymentMethod,
+
+
+
+                decoration:
+                InputDecoration(
+
+                  labelText:
+                  "Payment Method",
+
+
+                  prefixIcon:
+                  const Icon(
+                      Icons.payment
+                  ),
+
+
+                  border:
+                  OutlineInputBorder(
+
+                    borderRadius:
+                    BorderRadius.circular(12),
+
+                  ),
+
+                ),
+
+
+
+                items:
+                const [
+
+
+                  DropdownMenuItem(
+
+                    value:
+                    "Cash",
+
+                    child:
+                    Text(
+                        "Cash"
+                    ),
+
+                  ),
+
+
+                  DropdownMenuItem(
+
+                    value:
+                    "Mobile Money",
+
+                    child:
+                    Text(
+                        "Mobile Money"
+                    ),
+
+                  ),
+
+
+                  DropdownMenuItem(
+
+                    value:
+                    "Bank",
+
+                    child:
+                    Text(
+                        "Bank"
+                    ),
+
+                  ),
+
+
+                ],
+
+
+
+                onChanged:(value){
+
+                  setState(() {
+
+                    paymentMethod=value;
+
+                  });
+
+                },
+
+
+              ),
+
+
+
+
+              const SizedBox(height:18),
+
+
+
+
+
+              inputField(
+
+                label:
+                "Reference Number",
+
+                controller:
+                referenceController,
+
+                icon:
+                Icons.receipt_long,
+
+              ),
+
+
+
+
+
+              const SizedBox(height:18),
+
+
+
+
+              Card(
+
+                child:
+                ListTile(
+
+
+                  leading:
+                  const Icon(
+                      Icons.calendar_month
+                  ),
+
+
+
+                  title:
+                  Text(
+
+                    "Expense Date\n${expenseDate.toIso8601String().substring(0,10)}",
+
+                  ),
+
+
+
+                  trailing:
+                  const Icon(
+                      Icons.edit_calendar
+                  ),
+
+
+
+                  onTap:() async{
+
+
+                    final date =
+                    await showDatePicker(
+
+                      context:
+                      context,
+
+
+                      firstDate:
+                      DateTime(2020),
+
+
+                      lastDate:
+                      DateTime(2100),
+
+
+                      initialDate:
+                      expenseDate,
+
+                    );
+
+
+
+                    if(date!=null){
+
+                      setState(() {
+
+                        expenseDate=date;
+
+                      });
+
+                    }
+
+
+                  },
+
+
+                ),
+
+              ),
+
+
+
+
+              const SizedBox(height:18),
+
+
+
+
+              inputField(
+
+                label:
+                "Description",
+
+                controller:
+                descriptionController,
+
+                icon:
+                Icons.description,
+
+                maxLines:
+                3,
+
+              ),
+
+
+
+
+
+              const SizedBox(height:30),
+
+
+
+
+
+              SizedBox(
+
+                width:
+                double.infinity,
+
+
+                height:
+                55,
+
+
+
+                child:
+                ElevatedButton.icon(
+
+
+                  icon:
+                  saving
+
+                      ?
+                  const SizedBox(
+                    height:20,
+                    width:20,
+                    child:
+                    CircularProgressIndicator(
+                      strokeWidth:2,
+                    ),
+                  )
+
+                      :
+                  const Icon(
+                      Icons.save
+                  ),
+
+
+
+                  label:
+                  Text(
+
+                    saving
+                        ?
+                    "Updating..."
+                        :
+                    "UPDATE EXPENDITURE",
+
+                  ),
+
+
+
+                  onPressed:
+                  saving
+                      ?
+                  null
+                      :
+                  update,
+
+
+                ),
+
+              )
+
+
+
+            ],
+
+          ),
+
+
+        ),
+
+
+      ),
+
+
+    );
+
+
+  }
+
+
 }

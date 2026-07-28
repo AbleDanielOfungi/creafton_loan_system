@@ -145,14 +145,6 @@ class _EditBorrowerScreenState extends State<EditBorrowerScreen> {
       fieldOfficerId: widget.borrower.fieldOfficerId,
       nextPaymentDate: widget.borrower.nextPaymentDate,
       notes: notesController.text.trim(),
-
-      // notes: nameController.text.trim(),
-      // alternative_phone: alternativePhone.text.trim(),
-      // notes: dateOfBirth.text.trim(),
-
-      //     late TextEditingController nameController;
-      // late TextEditingController alternativePhone;
-      // late TextEditingController dateOfBirth;
       status: status,
       createdAt: widget.borrower.createdAt,
     );
@@ -196,46 +188,199 @@ class _EditBorrowerScreenState extends State<EditBorrowerScreen> {
     );
   }
 
+  // Widget input({
+  //   required String label,
+  //   required TextEditingController controller,
+  //   TextInputType keyboard = TextInputType.text,
+  //   int maxLines = 1,
+  //   bool requiredField = false,
+  // }) {
+  //   return Padding(
+  //     padding: const EdgeInsets.only(bottom: 16),
+  //     child: TextFormField(
+  //       controller: controller,
+  //       keyboardType: keyboard,
+  //       maxLines: maxLines,
+  //       validator: (value) {
+  //         if (requiredField && (value == null || value.trim().isEmpty)) {
+  //           return "$label is required";
+  //         }
+
+  //         return null;
+  //       },
+  //       decoration: InputDecoration(
+  //         labelText: label,
+  //         filled: true,
+  //         fillColor: Colors.white,
+  //         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+  //       ),
+  //     ),
+  //   );
+  // }
+
   Widget input({
     required String label,
     required TextEditingController controller,
     TextInputType keyboard = TextInputType.text,
     int maxLines = 1,
     bool requiredField = false,
+    IconData? icon,
   }) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: TextFormField(
-        controller: controller,
-        keyboardType: keyboard,
-        maxLines: maxLines,
-        validator: (value) {
-          if (requiredField && (value == null || value.trim().isEmpty)) {
-            return "$label is required";
-          }
+    return TextFormField(
+      controller: controller,
 
-          return null;
-        },
-        decoration: InputDecoration(
-          labelText: label,
-          filled: true,
-          fillColor: Colors.white,
-          border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+      keyboardType: keyboard,
+
+      maxLines: maxLines,
+
+      validator: (value) {
+        if (requiredField && (value == null || value.trim().isEmpty)) {
+          return "$label is required";
+        }
+
+        return null;
+      },
+
+      style: const TextStyle(
+        color: AppColors.textPrimary,
+
+        fontWeight: FontWeight.w500,
+      ),
+
+      decoration: InputDecoration(
+        labelText: label,
+
+        hintText: "Enter $label",
+
+        labelStyle: const TextStyle(
+          color: AppColors.textSecondary,
+
+          fontSize: 14,
+        ),
+
+        hintStyle: const TextStyle(color: Color(0xFF94A3B8), fontSize: 13),
+
+        prefixIcon: Icon(
+          icon ?? Icons.edit_outlined,
+
+          color: AppColors.primaryBlue,
+        ),
+
+        filled: true,
+
+        fillColor: AppColors.background,
+
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 18,
+
+          vertical: 18,
+        ),
+
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+
+          borderSide: const BorderSide(color: AppColors.border),
+        ),
+
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+
+          borderSide: const BorderSide(color: AppColors.border),
+        ),
+
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+
+          borderSide: const BorderSide(color: AppColors.primaryBlue, width: 2),
         ),
       ),
     );
   }
 
-  Widget buildCard({required String title, required List<Widget> children}) {
-    return Card(
-      elevation: 3,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [sectionTitle(title), ...children],
-        ),
+  // Widget buildCard({required String title, required List<Widget> children}) {
+  //   return Card(
+  //     elevation: 3,
+  //     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+  //     child: Padding(
+  //       padding: const EdgeInsets.all(20),
+  //       child: Column(
+  //         crossAxisAlignment: CrossAxisAlignment.start,
+  //         children: [sectionTitle(title), ...children],
+  //       ),
+  //     ),
+  //   );
+  // }
+
+  Widget buildCard({
+    required String title,
+
+    required List<Widget> children,
+
+    IconData icon = Icons.person_outline,
+  }) {
+    return Container(
+      width: double.infinity,
+
+      margin: const EdgeInsets.only(bottom: 25),
+
+      padding: const EdgeInsets.all(25),
+
+      decoration: BoxDecoration(
+        color: AppColors.card,
+
+        borderRadius: BorderRadius.circular(22),
+
+        border: Border.all(color: AppColors.border),
+
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(.04),
+
+            blurRadius: 20,
+
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+
+                decoration: BoxDecoration(
+                  color: AppColors.primaryBlue.withOpacity(.1),
+
+                  borderRadius: BorderRadius.circular(12),
+                ),
+
+                child: Icon(icon, color: AppColors.primaryBlue),
+              ),
+
+              const SizedBox(width: 12),
+
+              Text(
+                title,
+
+                style: const TextStyle(
+                  fontSize: 18,
+
+                  fontWeight: FontWeight.bold,
+
+                  color: AppColors.textPrimary,
+                ),
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 25),
+
+          ...children,
+        ],
       ),
     );
   }
@@ -243,7 +388,7 @@ class _EditBorrowerScreenState extends State<EditBorrowerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade100,
+      backgroundColor: AppColors.background,
 
       appBar: AppBar(
         backgroundColor: AppColors.primaryBlue,
@@ -270,6 +415,7 @@ class _EditBorrowerScreenState extends State<EditBorrowerScreen> {
                     controller: borrowerNumberController,
                     requiredField: true,
                   ),
+                  const SizedBox(height: 15),
 
                   input(
                     label: "Full Name",
@@ -458,15 +604,50 @@ class _EditBorrowerScreenState extends State<EditBorrowerScreen> {
   // TEXT FIELD
   //---------------------------------------------------------
 
+  // Widget _buildTextField({
+  //   required TextEditingController controller,
+  //   required String label,
+  //   required IconData icon,
+  //   int maxLines = 1,
+  // }) {
+  //   return TextFormField(
+  //     controller: controller,
+  //     maxLines: maxLines,
+  //     validator: (value) {
+  //       if (label == "Full Name" && (value == null || value.trim().isEmpty)) {
+  //         return "Full Name is required";
+  //       }
+
+  //       if (label == "Phone" && (value == null || value.trim().isEmpty)) {
+  //         return "Phone Number is required";
+  //       }
+
+  //       return null;
+  //     },
+  //     decoration: InputDecoration(
+  //       labelText: label,
+  //       prefixIcon: Icon(icon),
+  //       filled: true,
+  //       fillColor: Colors.grey.shade50,
+  //       border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+  //     ),
+  //   );
+  // }
+
   Widget _buildTextField({
     required TextEditingController controller,
+
     required String label,
+
     required IconData icon,
+
     int maxLines = 1,
   }) {
     return TextFormField(
       controller: controller,
+
       maxLines: maxLines,
+
       validator: (value) {
         if (label == "Full Name" && (value == null || value.trim().isEmpty)) {
           return "Full Name is required";
@@ -478,12 +659,47 @@ class _EditBorrowerScreenState extends State<EditBorrowerScreen> {
 
         return null;
       },
+
+      style: const TextStyle(
+        color: AppColors.textPrimary,
+
+        fontWeight: FontWeight.w500,
+      ),
+
       decoration: InputDecoration(
         labelText: label,
-        prefixIcon: Icon(icon),
+
+        hintText: "Enter $label",
+
+        prefixIcon: Icon(icon, color: AppColors.primaryBlue),
+
         filled: true,
-        fillColor: Colors.grey.shade50,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(14)),
+
+        fillColor: AppColors.background,
+
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 18,
+
+          vertical: 18,
+        ),
+
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+
+          borderSide: const BorderSide(color: AppColors.border),
+        ),
+
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+
+          borderSide: const BorderSide(color: AppColors.border),
+        ),
+
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+
+          borderSide: const BorderSide(color: AppColors.primaryBlue, width: 2),
+        ),
       ),
     );
   }

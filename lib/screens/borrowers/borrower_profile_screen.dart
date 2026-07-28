@@ -57,69 +57,172 @@ class _BorrowerProfileScreenState extends State<BorrowerProfileScreen> {
     await context.read<LoanProvider>().loadBorrowerLoans(id);
   }
 
+  // Widget _sectionTitle(String title) {
+  //   return Padding(
+  //     padding: const EdgeInsets.only(bottom: 10),
+
+  //     child: Text(
+  //       title,
+
+  //       style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+  //     ),
+  //   );
+  // }
+
+  // Widget _emptyCard(String message) {
+  //   return Card(
+  //     child: Padding(
+  //       padding: const EdgeInsets.all(20),
+
+  //       child: Center(child: Text(message)),
+  //     ),
+  //   );
+  // }
+
+  // Widget _item(String title, String value) {
+  //   return Padding(
+  //     padding: const EdgeInsets.only(bottom: 10),
+
+  //     child: Row(
+  //       crossAxisAlignment: CrossAxisAlignment.start,
+
+  //       children: [
+  //         SizedBox(
+  //           width: 140,
+
+  //           child: Text(
+  //             title,
+
+  //             style: const TextStyle(fontWeight: FontWeight.bold),
+  //           ),
+  //         ),
+
+  //         Expanded(child: Text(value)),
+  //       ],
+  //     ),
+  //   );
+  // }
+
   Widget _sectionTitle(String title) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-
+      padding: const EdgeInsets.only(bottom: 12),
       child: Text(
         title,
-
-        style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+          fontWeight: FontWeight.bold,
+          color: AppColors.textPrimary,
+        ),
       ),
     );
   }
 
   Widget _emptyCard(String message) {
-    return Card(
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-
-        child: Center(child: Text(message)),
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: AppColors.card,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppColors.border),
       ),
-    );
-  }
-
-  Widget _item(String title, String value) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-
+      child: Column(
         children: [
-          SizedBox(
-            width: 140,
+          Icon(Icons.info_outline, size: 36, color: AppColors.textSecondary),
 
-            child: Text(
-              title,
+          const SizedBox(height: 12),
 
-              style: const TextStyle(fontWeight: FontWeight.bold),
-            ),
+          Text(
+            message,
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),
           ),
-
-          Expanded(child: Text(value)),
         ],
       ),
     );
   }
 
   Widget _infoCard(List<Widget> children) {
-    return Card(
-      elevation: 2,
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(24),
 
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+      decoration: BoxDecoration(
+        color: AppColors.card,
 
-      child: Padding(
-        padding: const EdgeInsets.all(16),
+        borderRadius: BorderRadius.circular(20),
 
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        border: Border.all(color: AppColors.border),
 
-          children: children,
-        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 18,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: children,
       ),
     );
   }
+
+  Widget _item(String title, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 14),
+
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+
+        children: [
+          SizedBox(
+            width: 150,
+
+            child: Text(
+              title,
+
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: AppColors.textSecondary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+
+          Expanded(
+            child: Text(
+              value,
+
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: AppColors.textPrimary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Widget _infoCard(List<Widget> children) {
+  //   return Card(
+  //     elevation: 2,
+
+  //     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+
+  //     child: Padding(
+  //       padding: const EdgeInsets.all(16),
+
+  //       child: Column(
+  //         crossAxisAlignment: CrossAxisAlignment.start,
+
+  //         children: children,
+  //       ),
+  //     ),
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -159,7 +262,7 @@ class _BorrowerProfileScreenState extends State<BorrowerProfileScreen> {
                               children: [
                                 _informationCard(),
                                 const SizedBox(height: 25),
-                                _performanceCard(statisticsProvider),
+                                // _performanceCard(statisticsProvider),
                                 _sectionTitle("Assigned Field Officer"),
 
                                 Consumer<FieldOfficerProvider>(
@@ -239,6 +342,7 @@ class _BorrowerProfileScreenState extends State<BorrowerProfileScreen> {
                                             provider.guarantors[index];
 
                                         return Card(
+                                          color: Colors.white,
                                           margin: const EdgeInsets.only(
                                             bottom: 12,
                                           ),
@@ -303,121 +407,6 @@ class _BorrowerProfileScreenState extends State<BorrowerProfileScreen> {
                         ],
                       ),
 
-                      _sectionTitle("Assigned Field Officer"),
-
-                      Consumer<FieldOfficerProvider>(
-                        builder: (context, provider, _) {
-                          if (provider.loading) {
-                            return const Center(
-                              child: CircularProgressIndicator(),
-                            );
-                          }
-
-                          FieldOfficer? officer;
-
-                          try {
-                            officer = provider.officers.firstWhere(
-                              (item) =>
-                                  item.id == widget.borrower.fieldOfficerId,
-                            );
-                          } catch (e) {
-                            officer = null;
-                          }
-
-                          if (officer == null) {
-                            return _emptyCard("No field officer assigned");
-                          }
-
-                          return _infoCard([
-                            _item("Officer Number", officer.officerNumber),
-
-                            _item("Name", officer.fullName),
-
-                            _item("Phone", officer.phone),
-
-                            _item(
-                              "District",
-                              officer.district ?? "Not provided",
-                            ),
-
-                            _item("Status", officer.status),
-                          ]);
-                        },
-                      ),
-
-                      const SizedBox(height: 25),
-
-                      _sectionTitle("Guarantors"),
-
-                      Consumer<GuarantorProvider>(
-                        builder: (context, provider, _) {
-                          if (provider.loading) {
-                            return const Center(
-                              child: CircularProgressIndicator(),
-                            );
-                          }
-
-                          if (provider.guarantors.isEmpty) {
-                            return _emptyCard("No guarantors registered");
-                          }
-
-                          return ListView.builder(
-                            shrinkWrap: true,
-
-                            physics: const NeverScrollableScrollPhysics(),
-
-                            itemCount: provider.guarantors.length,
-
-                            itemBuilder: (context, index) {
-                              final guarantor = provider.guarantors[index];
-
-                              return Card(
-                                margin: const EdgeInsets.only(bottom: 12),
-
-                                child: ListTile(
-                                  leading: CircleAvatar(
-                                    child: Text(
-                                      guarantor.fullName
-                                          .substring(0, 1)
-                                          .toUpperCase(),
-                                    ),
-                                  ),
-
-                                  title: Text(
-                                    guarantor.fullName,
-
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-
-                                  subtitle: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-
-                                    children: [
-                                      Text(
-                                        guarantor.relationship ??
-                                            "Relationship not set",
-                                      ),
-
-                                      Text(guarantor.phone ?? "No phone"),
-
-                                      Text(
-                                        guarantor.nationalId ??
-                                            "No National ID",
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            },
-                          );
-                        },
-                      ),
-
-                      const SizedBox(height: 25),
-
                       const SizedBox(height: 30),
                       _actionButtons(),
                     ],
@@ -431,67 +420,184 @@ class _BorrowerProfileScreenState extends State<BorrowerProfileScreen> {
     );
   }
 
+  // Widget _profileHeader() {
+  //   return Container(
+  //     padding: const EdgeInsets.all(25),
+  //     decoration: BoxDecoration(
+  //       color: Colors.white,
+  //       borderRadius: BorderRadius.circular(20),
+  //       boxShadow: [
+  //         BoxShadow(
+  //           color: Colors.black.withOpacity(0.04),
+  //           blurRadius: 20,
+  //           offset: const Offset(0, 4),
+  //         ),
+  //       ],
+  //     ),
+  //     child: Row(
+  //       children: [
+  //         CircleAvatar(
+  //           radius: 40,
+  //           backgroundColor: AppColors.primaryBlue.withOpacity(0.1),
+  //           child: Text(
+  //             widget.borrower.fullName.isNotEmpty
+  //                 ? widget.borrower.fullName[0].toUpperCase()
+  //                 : "?",
+  //             style: TextStyle(
+  //               color: AppColors.primaryBlue,
+  //               fontSize: 32,
+  //               fontWeight: FontWeight.bold,
+  //             ),
+  //           ),
+  //         ),
+  //         const SizedBox(width: 20),
+  //         Expanded(
+  //           child: Column(
+  //             crossAxisAlignment: CrossAxisAlignment.start,
+  //             children: [
+  //               Text(
+  //                 widget.borrower.fullName,
+  //                 style: const TextStyle(
+  //                   fontSize: 24,
+  //                   fontWeight: FontWeight.bold,
+  //                   color: Color(0xFF1E293B),
+  //                 ),
+  //               ),
+  //               const SizedBox(height: 6),
+  //               Text(
+  //                 widget.borrower.phone,
+  //                 style: const TextStyle(
+  //                   color: Colors.grey,
+  //                   fontSize: 14,
+  //                   fontWeight: FontWeight.w500,
+  //                 ),
+  //               ),
+  //             ],
+  //           ),
+  //         ),
+  //         Chip(
+  //           label: Text(widget.borrower.status),
+  //           backgroundColor: Colors.green.withOpacity(0.1),
+  //           labelStyle: const TextStyle(
+  //             color: Colors.green,
+  //             fontWeight: FontWeight.bold,
+  //           ),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
+
   Widget _profileHeader() {
     return Container(
-      padding: const EdgeInsets.all(25),
+      padding: const EdgeInsets.all(28),
+
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        gradient: LinearGradient(
+          colors: [
+            AppColors.primaryBlue,
+
+            AppColors.primaryBlue.withOpacity(.85),
+          ],
+        ),
+
+        borderRadius: BorderRadius.circular(24),
+
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: AppColors.primaryBlue.withOpacity(.25),
+
             blurRadius: 20,
-            offset: const Offset(0, 4),
+
+            offset: const Offset(0, 8),
           ),
         ],
       ),
+
       child: Row(
         children: [
           CircleAvatar(
-            radius: 40,
-            backgroundColor: AppColors.primaryBlue.withOpacity(0.1),
+            radius: 45,
+
+            backgroundColor: Colors.white.withOpacity(.15),
+
             child: Text(
               widget.borrower.fullName.isNotEmpty
                   ? widget.borrower.fullName[0].toUpperCase()
                   : "?",
-              style: TextStyle(
-                color: AppColors.primaryBlue,
-                fontSize: 32,
+
+              style: const TextStyle(
+                color: Colors.white,
+
+                fontSize: 34,
+
                 fontWeight: FontWeight.bold,
               ),
             ),
           ),
-          const SizedBox(width: 20),
+
+          const SizedBox(width: 25),
+
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
+
               children: [
                 Text(
                   widget.borrower.fullName,
+
                   style: const TextStyle(
-                    fontSize: 24,
+                    color: Colors.white,
+
+                    fontSize: 26,
+
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF1E293B),
                   ),
                 ),
-                const SizedBox(height: 6),
+
+                const SizedBox(height: 8),
+
+                Text(
+                  "Borrower ID: ${widget.borrower.borrowerNumber}",
+
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(.8),
+
+                    fontSize: 14,
+                  ),
+                ),
+
                 Text(
                   widget.borrower.phone,
-                  style: const TextStyle(
-                    color: Colors.grey,
+
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(.8),
+
                     fontSize: 14,
-                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ],
             ),
           ),
-          Chip(
-            label: Text(widget.borrower.status),
-            backgroundColor: Colors.green.withOpacity(0.1),
-            labelStyle: const TextStyle(
+
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
+
+            decoration: BoxDecoration(
               color: Colors.green,
-              fontWeight: FontWeight.bold,
+
+              borderRadius: BorderRadius.circular(30),
+              border: Border.all(color: Colors.white),
+            ),
+
+            child: Text(
+              widget.borrower.status,
+
+              style: const TextStyle(
+                color: Colors.white,
+
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ],
@@ -501,6 +607,7 @@ class _BorrowerProfileScreenState extends State<BorrowerProfileScreen> {
 
   Widget _informationCard() {
     return Card(
+      color: Colors.white,
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
@@ -534,6 +641,7 @@ class _BorrowerProfileScreenState extends State<BorrowerProfileScreen> {
 
   Widget _loanSummary(LoanProvider provider) {
     return Card(
+      color: Colors.white,
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
@@ -575,72 +683,73 @@ class _BorrowerProfileScreenState extends State<BorrowerProfileScreen> {
     );
   }
 
-  Widget _performanceCard(BorrowerStatisticsProvider provider) {
-    final stats = provider.statistics;
-    final score = stats?.repaymentScore ?? 0;
+  // Widget _performanceCard(BorrowerStatisticsProvider provider) {
+  //   final stats = provider.statistics;
+  //   final score = stats?.repaymentScore ?? 0;
 
-    return Card(
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-        side: BorderSide(color: Colors.grey.shade200),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              "Borrower Performance",
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF1E293B),
-              ),
-            ),
-            const SizedBox(height: 15),
-            LinearProgressIndicator(
-              value: (score / 100).clamp(0, 1),
-              minHeight: 10,
-              backgroundColor: Colors.grey.shade100,
-              valueColor: AlwaysStoppedAnimation<Color>(
-                score > 70
-                    ? Colors.green
-                    : (score > 40 ? Colors.orange : Colors.red),
-              ),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              "Performance Score: ${score.toStringAsFixed(1)}%",
-              style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
-            ),
-            const SizedBox(height: 20),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _stat(
-                  "Payments",
-                  stats?.totalPayments.toString() ?? "0",
-                  Colors.blueGrey,
-                ),
-                _stat(
-                  "Late",
-                  stats?.latePayments.toString() ?? "0",
-                  Colors.orange,
-                ),
-                _stat(
-                  "Missed",
-                  stats?.missedPayments.toString() ?? "0",
-                  Colors.red,
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+  //   return Card(
+  //     elevation: 0,
+  //     color: Colors.white,
+  //     shape: RoundedRectangleBorder(
+  //       borderRadius: BorderRadius.circular(20),
+  //       side: BorderSide(color: Colors.grey.shade200),
+  //     ),
+  //     child: Padding(
+  //       padding: const EdgeInsets.all(24),
+  //       child: Column(
+  //         crossAxisAlignment: CrossAxisAlignment.start,
+  //         children: [
+  //           const Text(
+  //             "Borrower Performance",
+  //             style: TextStyle(
+  //               fontSize: 18,
+  //               fontWeight: FontWeight.bold,
+  //               color: Color(0xFF1E293B),
+  //             ),
+  //           ),
+  //           const SizedBox(height: 15),
+  //           LinearProgressIndicator(
+  //             value: (score / 100).clamp(0, 1),
+  //             minHeight: 10,
+  //             backgroundColor: Colors.grey.shade100,
+  //             valueColor: AlwaysStoppedAnimation<Color>(
+  //               score > 70
+  //                   ? Colors.green
+  //                   : (score > 40 ? Colors.orange : Colors.red),
+  //             ),
+  //             borderRadius: BorderRadius.circular(10),
+  //           ),
+  //           const SizedBox(height: 10),
+  //           Text(
+  //             "Performance Score: ${score.toStringAsFixed(1)}%",
+  //             style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+  //           ),
+  //           const SizedBox(height: 20),
+  //           Row(
+  //             mainAxisAlignment: MainAxisAlignment.spaceAround,
+  //             children: [
+  //               _stat(
+  //                 "Payments",
+  //                 stats?.totalPayments.toString() ?? "0",
+  //                 Colors.blueGrey,
+  //               ),
+  //               _stat(
+  //                 "Late",
+  //                 stats?.latePayments.toString() ?? "0",
+  //                 Colors.orange,
+  //               ),
+  //               _stat(
+  //                 "Missed",
+  //                 stats?.missedPayments.toString() ?? "0",
+  //                 Colors.red,
+  //               ),
+  //             ],
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Widget _actionButtons() {
     return Row(

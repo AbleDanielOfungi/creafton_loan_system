@@ -11,6 +11,7 @@ class BorrowerLoansCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
+      color: Colors.white,
       elevation: 3,
 
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
@@ -59,9 +60,12 @@ class BorrowerLoansCard extends StatelessWidget {
   }
 
   Widget _loanTile(BuildContext context, Loan loan) {
-    final statusColor = loan.status == "ACTIVE" ? Colors.green : Colors.grey;
+    final statusColor = loan.status == "ACTIVE"
+        ? const Color.fromARGB(255, 2, 226, 10)
+        : Colors.grey;
 
     return Card(
+      color: const Color(0xFFF4F7FA),
       margin: const EdgeInsets.only(bottom: 12),
 
       child: ListTile(
