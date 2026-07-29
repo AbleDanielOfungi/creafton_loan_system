@@ -2,6 +2,9 @@ import 'package:creafton_financial_services/screens/expenditures/expenditure_scr
 import 'package:creafton_financial_services/screens/field%20offficers/field_officers_screen.dart';
 import 'package:creafton_financial_services/screens/guarantors/main_guarantor_screen.dart';
 import 'package:creafton_financial_services/screens/reports/expenditure_reports_screen.dart';
+// import 'package:creafton_financial_services/screens/reports/report/financial_reports_screen.dart';
+import 'package:creafton_financial_services/screens/reports/report/reports_screen.dart';
+import 'package:creafton_financial_services/screens/reports/reports_dashboard_screen.dart';
 // import 'package:creafton_financial_services/screens/guarantors/main_guarantors_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -63,7 +66,7 @@ class _MainShellState extends State<MainShell> {
           break;
 
         case "Reports":
-          _selectedPage = const Center(child: Text("Reports Module"));
+          _selectedPage = const ReportsScreen();
 
           break;
 

@@ -1,3 +1,4 @@
+import 'package:creafton_financial_services/core/theme/app_colors.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -5,33 +6,17 @@ import '../../models/expenditure.dart';
 import '../../providers/expenditure_provider.dart';
 import '../../providers/expenditure_category_provider.dart';
 
-
 class EditExpenditureScreen extends StatefulWidget {
-
   final Expenditure expenditure;
 
-
-  const EditExpenditureScreen({
-    super.key,
-    required this.expenditure,
-  });
-
+  const EditExpenditureScreen({super.key, required this.expenditure});
 
   @override
-  State<EditExpenditureScreen> createState() =>
-      _EditExpenditureScreenState();
-
+  State<EditExpenditureScreen> createState() => _EditExpenditureScreenState();
 }
 
-
-
-class _EditExpenditureScreenState
-    extends State<EditExpenditureScreen> {
-
-
-  final formKey =
-      GlobalKey<FormState>();
-
+class _EditExpenditureScreenState extends State<EditExpenditureScreen> {
+  final formKey = GlobalKey<FormState>();
 
   late TextEditingController titleController;
 
@@ -41,88 +26,47 @@ class _EditExpenditureScreenState
 
   late TextEditingController descriptionController;
 
-
-
   late int categoryId;
-
 
   String? paymentMethod;
 
-
   late DateTime expenseDate;
 
-
-  bool saving=false;
-
-
+  bool saving = false;
 
   @override
-  void initState(){
-
+  void initState() {
     super.initState();
 
+    final expense = widget.expenditure;
 
-    final expense =
-        widget.expenditure;
+    titleController = TextEditingController(text: expense.title);
 
+    amountController = TextEditingController(
+      text: expense.amount.toStringAsFixed(0),
+    );
 
-    titleController =
-        TextEditingController(
-          text: expense.title,
-        );
+    referenceController = TextEditingController(
+      text: expense.referenceNumber ?? "",
+    );
 
+    descriptionController = TextEditingController(
+      text: expense.description ?? "",
+    );
 
-    amountController =
-        TextEditingController(
-          text: expense.amount.toStringAsFixed(0),
-        );
+    categoryId = expense.categoryId;
 
+    paymentMethod = expense.paymentMethod;
 
-    referenceController =
-        TextEditingController(
-          text: expense.referenceNumber ?? "",
-        );
+    expenseDate = DateTime.parse(expense.expenseDate);
 
-
-    descriptionController =
-        TextEditingController(
-          text: expense.description ?? "",
-        );
-
-
-    categoryId =
-        expense.categoryId;
-
-
-    paymentMethod =
-        expense.paymentMethod;
-
-
-    expenseDate =
-        DateTime.parse(
-          expense.expenseDate,
-        );
-
-
-
-    WidgetsBinding.instance
-        .addPostFrameCallback((_){
-
-      context
-          .read<ExpenditureCategoryProvider>()
-          .loadCategories();
-
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<ExpenditureCategoryProvider>().loadCategories();
     });
-
-
   }
 
-
-
-
   @override
-  void dispose(){
-
+  void dispose() {
     titleController.dispose();
 
     amountController.dispose();
@@ -132,720 +76,298 @@ class _EditExpenditureScreenState
     descriptionController.dispose();
 
     super.dispose();
-
   }
 
-
-
-
-  Future<void> update() async{
-
-
-    if(!formKey.currentState!.validate()){
+  Future<void> update() async {
+    if (!formKey.currentState!.validate()) {
       return;
     }
 
-
     setState(() {
-
-      saving=true;
-
+      saving = true;
     });
 
+    try {
+      final updated = widget.expenditure.copyWith(
+        categoryId: categoryId,
 
+        title: titleController.text.trim(),
 
-    try{
+        amount: double.parse(amountController.text.replaceAll(",", "")),
 
+        paymentMethod: paymentMethod,
 
-      final updated =
-      widget.expenditure.copyWith(
+        referenceNumber: referenceController.text.trim(),
 
+        description: descriptionController.text.trim(),
 
-        categoryId:
-        categoryId,
-
-
-        title:
-        titleController.text.trim(),
-
-
-        amount:
-        double.parse(
-          amountController.text.replaceAll(",", ""),
-        ),
-
-
-        paymentMethod:
-        paymentMethod,
-
-
-        referenceNumber:
-        referenceController.text.trim(),
-
-
-        description:
-        descriptionController.text.trim(),
-
-
-        expenseDate:
-        expenseDate
-            .toIso8601String()
-            .substring(0,10),
-
-
+        expenseDate: expenseDate.toIso8601String().substring(0, 10),
       );
 
-
-
-      final success =
-      await context
+      final success = await context
           .read<ExpenditureProvider>()
-          .updateExpenditure(
-          updated
-      );
+          .updateExpenditure(updated);
 
+      if (!mounted) return;
 
-
-      if(!mounted)return;
-
-
-
-      if(success){
-
-
-        ScaffoldMessenger.of(context)
-            .showSnackBar(
-
-          const SnackBar(
-
-            content:
-            Text(
-                "Expenditure updated successfully"
-            ),
-
-          ),
-
+      if (success) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Expenditure updated successfully")),
         );
 
-
         Navigator.pop(context);
-
-
       }
-
-
-
-    }
-    catch(e){
-
-
-      ScaffoldMessenger.of(context)
-          .showSnackBar(
-
-        SnackBar(
-          content:
-          Text(
-              e.toString()
-          ),
-        ),
-
-      );
-
-
-    }
-    finally{
-
-
-      if(mounted){
-
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.toString())));
+    } finally {
+      if (mounted) {
         setState(() {
-
-          saving=false;
-
+          saving = false;
         });
-
       }
-
-
     }
-
-
-
   }
 
-
-
-
-
-
-
   Widget inputField({
-
     required String label,
 
     required TextEditingController controller,
 
     required IconData icon,
 
-    TextInputType type =
-    TextInputType.text,
+    TextInputType type = TextInputType.text,
 
-
-    int maxLines=1,
-
-  }){
-
-
+    int maxLines = 1,
+  }) {
     return TextFormField(
+      controller: controller,
 
-      controller:
-      controller,
+      keyboardType: type,
 
+      maxLines: maxLines,
 
-      keyboardType:
-      type,
-
-
-      maxLines:
-      maxLines,
-
-
-      validator:(value){
-
-
-        if(value==null ||
-            value.trim().isEmpty){
-
+      validator: (value) {
+        if (value == null || value.trim().isEmpty) {
           return "$label required";
-
         }
 
-
         return null;
-
-
       },
 
+      decoration: InputDecoration(
+        labelText: label,
 
-      decoration:
-      InputDecoration(
+        prefixIcon: Icon(icon),
 
-        labelText:
-        label,
-
-
-        prefixIcon:
-        Icon(icon),
-
-
-        border:
-        OutlineInputBorder(
-
-          borderRadius:
-          BorderRadius.circular(12),
-
-        ),
-
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
       ),
-
     );
-
-
   }
-
-
-
-
-
-
 
   @override
-  Widget build(BuildContext context){
-
-
+  Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.background,
 
-
-      appBar:
-      AppBar(
-
-        title:
-        const Text(
-            "Edit Expenditure"
+      appBar: AppBar(
+        title: const Text(
+          "Edit Expenditure",
+          style: TextStyle(fontWeight: FontWeight.w500, color: Colors.white),
         ),
-
+        backgroundColor: AppColors.primaryBlue,
       ),
 
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 250),
 
+        child: Form(
+          key: formKey,
 
-
-
-      body:
-      SingleChildScrollView(
-
-
-        padding:
-        const EdgeInsets.all(20),
-
-
-
-        child:
-        Form(
-
-
-          key:
-          formKey,
-
-
-
-          child:
-          Column(
-
-            children:[
-
-
-
+          child: Column(
+            children: [
+              SizedBox(height: 30),
               Consumer<ExpenditureCategoryProvider>(
-
-                builder:
-                (context,provider,_){
-
-
+                builder: (context, provider, _) {
                   return DropdownButtonFormField<int>(
+                    value: categoryId,
 
+                    decoration: InputDecoration(
+                      labelText: "Expense Category",
 
-                    value:
-                    categoryId,
+                      prefixIcon: const Icon(Icons.category),
 
-
-                    decoration:
-                    InputDecoration(
-
-
-                      labelText:
-                      "Expense Category",
-
-
-                      prefixIcon:
-                      const Icon(
-                          Icons.category
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
-
-
-                      border:
-                      OutlineInputBorder(
-
-                        borderRadius:
-                        BorderRadius.circular(12),
-
-                      ),
-
                     ),
 
-
-
-                    items:
-
-                    provider.categories
+                    items: provider.categories
                         .map(
+                          (category) => DropdownMenuItem<int>(
+                            value: category.id,
 
-                            (category)=>DropdownMenuItem<int>(
-
-                          value:
-                          category.id,
-
-
-                          child:
-                          Text(
-                              category.name
+                            child: Text(category.name),
                           ),
-
-
                         )
-
-                    )
                         .toList(),
 
-
-
-                    onChanged:(value){
-
+                    onChanged: (value) {
                       setState(() {
-
-                        categoryId=value!;
-
+                        categoryId = value!;
                       });
-
                     },
-
                   );
-
-
                 },
-
               ),
 
-
-
-              const SizedBox(height:18),
-
-
-
+              const SizedBox(height: 18),
 
               inputField(
+                label: "Expense Title",
 
-                label:
-                "Expense Title",
+                controller: titleController,
 
-                controller:
-                titleController,
-
-                icon:
-                Icons.title,
-
+                icon: Icons.title,
               ),
 
-
-
-
-              const SizedBox(height:18),
-
-
-
-
+              const SizedBox(height: 18),
 
               inputField(
+                label: "Amount (UGX)",
 
-                label:
-                "Amount (UGX)",
+                controller: amountController,
 
-                controller:
-                amountController,
+                icon: Icons.money,
 
-                icon:
-                Icons.money,
-
-                type:
-                TextInputType.number,
-
+                type: TextInputType.number,
               ),
 
-
-
-
-              const SizedBox(height:18),
-
-
-
-
+              const SizedBox(height: 18),
 
               DropdownButtonFormField<String>(
+                value: paymentMethod,
 
+                decoration: InputDecoration(
+                  labelText: "Payment Method",
 
-                value:
-                paymentMethod,
+                  prefixIcon: const Icon(Icons.payment),
 
-
-
-                decoration:
-                InputDecoration(
-
-                  labelText:
-                  "Payment Method",
-
-
-                  prefixIcon:
-                  const Icon(
-                      Icons.payment
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
                   ),
-
-
-                  border:
-                  OutlineInputBorder(
-
-                    borderRadius:
-                    BorderRadius.circular(12),
-
-                  ),
-
                 ),
 
-
-
-                items:
-                const [
-
+                items: const [
+                  DropdownMenuItem(value: "Cash", child: Text("Cash")),
 
                   DropdownMenuItem(
+                    value: "Mobile Money",
 
-                    value:
-                    "Cash",
-
-                    child:
-                    Text(
-                        "Cash"
-                    ),
-
+                    child: Text("Mobile Money"),
                   ),
 
-
-                  DropdownMenuItem(
-
-                    value:
-                    "Mobile Money",
-
-                    child:
-                    Text(
-                        "Mobile Money"
-                    ),
-
-                  ),
-
-
-                  DropdownMenuItem(
-
-                    value:
-                    "Bank",
-
-                    child:
-                    Text(
-                        "Bank"
-                    ),
-
-                  ),
-
-
+                  DropdownMenuItem(value: "Bank", child: Text("Bank")),
                 ],
 
-
-
-                onChanged:(value){
-
+                onChanged: (value) {
                   setState(() {
-
-                    paymentMethod=value;
-
+                    paymentMethod = value;
                   });
-
                 },
-
-
               ),
 
-
-
-
-              const SizedBox(height:18),
-
-
-
-
+              const SizedBox(height: 18),
 
               inputField(
+                label: "Reference Number",
 
-                label:
-                "Reference Number",
+                controller: referenceController,
 
-                controller:
-                referenceController,
-
-                icon:
-                Icons.receipt_long,
-
+                icon: Icons.receipt_long,
               ),
 
-
-
-
-
-              const SizedBox(height:18),
-
-
-
+              const SizedBox(height: 18),
 
               Card(
+                child: ListTile(
+                  leading: const Icon(Icons.calendar_month),
 
-                child:
-                ListTile(
-
-
-                  leading:
-                  const Icon(
-                      Icons.calendar_month
+                  title: Text(
+                    "Expense Date\n${expenseDate.toIso8601String().substring(0, 10)}",
                   ),
 
+                  trailing: const Icon(Icons.edit_calendar),
 
+                  onTap: () async {
+                    final date = await showDatePicker(
+                      context: context,
 
-                  title:
-                  Text(
+                      firstDate: DateTime(2020),
 
-                    "Expense Date\n${expenseDate.toIso8601String().substring(0,10)}",
+                      lastDate: DateTime(2100),
 
-                  ),
-
-
-
-                  trailing:
-                  const Icon(
-                      Icons.edit_calendar
-                  ),
-
-
-
-                  onTap:() async{
-
-
-                    final date =
-                    await showDatePicker(
-
-                      context:
-                      context,
-
-
-                      firstDate:
-                      DateTime(2020),
-
-
-                      lastDate:
-                      DateTime(2100),
-
-
-                      initialDate:
-                      expenseDate,
-
+                      initialDate: expenseDate,
                     );
 
-
-
-                    if(date!=null){
-
+                    if (date != null) {
                       setState(() {
-
-                        expenseDate=date;
-
+                        expenseDate = date;
                       });
-
                     }
-
-
                   },
-
-
                 ),
-
               ),
 
-
-
-
-              const SizedBox(height:18),
-
-
-
+              const SizedBox(height: 18),
 
               inputField(
+                label: "Description",
 
-                label:
-                "Description",
+                controller: descriptionController,
 
-                controller:
-                descriptionController,
+                icon: Icons.description,
 
-                icon:
-                Icons.description,
-
-                maxLines:
-                3,
-
+                maxLines: 3,
               ),
 
-
-
-
-
-              const SizedBox(height:30),
-
-
-
-
+              const SizedBox(height: 30),
 
               SizedBox(
+                width: double.infinity,
 
-                width:
-                double.infinity,
+                height: 55,
 
+                child: ElevatedButton.icon(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primaryBlue,
 
-                height:
-                55,
-
-
-
-                child:
-                ElevatedButton.icon(
-
-
-                  icon:
-                  saving
-
-                      ?
-                  const SizedBox(
-                    height:20,
-                    width:20,
-                    child:
-                    CircularProgressIndicator(
-                      strokeWidth:2,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
-                  )
-
-                      :
-                  const Icon(
-                      Icons.save
                   ),
 
+                  icon: saving
+                      ? const SizedBox(
+                          height: 20,
+                          width: 20,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Icon(Icons.save),
 
-
-                  label:
-                  Text(
-
-                    saving
-                        ?
-                    "Updating..."
-                        :
-                    "UPDATE EXPENDITURE",
-
+                  label: Text(
+                    saving ? "Updating..." : "UPDATE EXPENDITURE",
+                    style: const TextStyle(fontSize: 16, color: Colors.white),
                   ),
 
-
-
-                  onPressed:
-                  saving
-                      ?
-                  null
-                      :
-                  update,
-
-
+                  onPressed: saving ? null : update,
                 ),
-
-              )
-
-
-
+              ),
             ],
-
           ),
-
-
         ),
-
-
       ),
-
-
     );
-
-
   }
-
-
 }

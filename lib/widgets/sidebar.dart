@@ -36,13 +36,7 @@ class Sidebar extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
 
             children: [
-              const Icon(
-                Icons.account_balance,
-
-                color: AppColors.primaryBlue,
-
-                size: 32,
-              ),
+              Image.asset('assets/logo.png', width: 40, height: 40),
 
               if (!collapsed) const SizedBox(width: 10),
 
@@ -69,10 +63,8 @@ class Sidebar extends StatelessWidget {
                 _menu(Icons.money, "Guarantors"),
 
                 _menu(Icons.payment, "Expenditures"),
-                _menu(Icons.payment, "Expenditures Reports"),
-                _menu(Icons.bar_chart, "Reports"),
 
-                _menu(Icons.settings, "Settings"),
+                _menu(Icons.bar_chart, "Reports"),
               ],
             ),
           ),

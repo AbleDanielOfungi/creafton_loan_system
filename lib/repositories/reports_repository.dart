@@ -22,6 +22,8 @@ class ReportsRepository {
     return Sqflite.firstIntValue(result) ?? 0;
   }
 
+
+
   Future<int> totalFieldOfficers() async {
     final db = await _db;
 
@@ -480,4 +482,265 @@ ORDER BY expense_date DESC
 
 ''');
   }
+
+  // =====================================================
+// CUSTOM LOANS REPORT
+// =====================================================
+
+Future<List<Map<String, dynamic>>> customLoans(
+  DateTime from,
+  DateTime to,
+) async {
+  final db = await DatabaseHelper.database;
+
+  return await db.rawQuery(
+    '''
+    SELECT
+
+      loans.*,
+
+      borrowers.borrower_number,
+      borrowers.full_name,
+      borrowers.phone,
+
+      field_officers.full_name AS field_officer
+
+    FROM loans
+
+    INNER JOIN borrowers
+      ON borrowers.id = loans.borrower_id
+
+    LEFT JOIN field_officers
+      ON field_officers.id = borrowers.field_officer_id
+
+    WHERE date(loans.created_at)
+
+    BETWEEN date(?)
+
+    AND date(?)
+
+    ORDER BY loans.created_at DESC
+    ''',
+    [
+      from.toIso8601String(),
+      to.toIso8601String(),
+    ],
+  );
+}
+
+//////////////////////////////////////////////////////////
+// CUSTOM PAYMENTS REPORT
+//////////////////////////////////////////////////////////
+
+Future<List<Map<String, dynamic>>> customPayments(
+  DateTime from,
+  DateTime to,
+) async {
+  final db = await DatabaseHelper.database;
+
+  return await db.rawQuery(
+    '''
+    SELECT
+
+      loan_payments.*,
+
+      loans.loan_number,
+
+      borrowers.borrower_number,
+      borrowers.full_name,
+
+      field_officers.full_name AS field_officer
+
+    FROM loan_payments
+
+    INNER JOIN loans
+
+      ON loans.id = loan_payments.loan_id
+
+    INNER JOIN borrowers
+
+      ON borrowers.id = loans.borrower_id
+
+    LEFT JOIN field_officers
+
+      ON field_officers.id = borrowers.field_officer_id
+
+    WHERE date(loan_payments.payment_date)
+
+    BETWEEN date(?)
+
+    AND date(?)
+
+    ORDER BY loan_payments.payment_date DESC
+    ''',
+    [
+      from.toIso8601String(),
+      to.toIso8601String(),
+    ],
+  );
+}
+
+//////////////////////////////////////////////////////////
+// CUSTOM DEFAULTERS REPORT
+//////////////////////////////////////////////////////////
+
+Future<List<Map<String, dynamic>>> customDefaulters(
+  DateTime from,
+  DateTime to,
+) async {
+  final db = await DatabaseHelper.database;
+
+  return await db.rawQuery(
+    '''
+    SELECT
+
+      loans.*,
+
+      borrowers.borrower_number,
+      borrowers.full_name,
+      borrowers.phone,
+
+      guarantors.full_name AS guarantor,
+
+      field_officers.full_name AS field_officer
+
+    FROM loans
+
+    INNER JOIN borrowers
+
+      ON borrowers.id = loans.borrower_id
+
+    LEFT JOIN guarantors
+
+      ON guarantors.borrower_id = borrowers.id
+
+    LEFT JOIN field_officers
+
+      ON field_officers.id = borrowers.field_officer_id
+
+    WHERE
+
+      loans.status='ACTIVE'
+
+      AND
+
+      loans.remaining_balance>0
+
+      AND
+
+      date(loans.end_date)
+
+      BETWEEN date(?)
+
+      AND date(?)
+
+    ORDER BY loans.end_date
+    ''',
+    [
+      from.toIso8601String(),
+      to.toIso8601String(),
+    ],
+  );
+}
+
+Future<List<Map<String, dynamic>>> dailyCollectionTrend() async {
+
+  final db = await DatabaseHelper.database;
+
+  return await db.rawQuery("""
+
+SELECT
+DATE(payment_date) AS label,
+SUM(amount) AS amount
+
+FROM loan_payments
+
+WHERE payment_date IS NOT NULL
+
+GROUP BY DATE(payment_date)
+
+ORDER BY DATE(payment_date)
+
+LIMIT 7
+
+""");
+
+}
+
+// ======================================================
+// DAILY COLLECTION TREND
+// ======================================================
+
+// Future<List<Map<String, dynamic>>> dailyCollectionTrend() async {
+//   final db = await DatabaseHelper.database;
+
+//   return await db.rawQuery("""
+//     SELECT
+//       DATE(payment_date) AS label,
+//       SUM(amount) AS amount
+//     FROM loan_payments
+//     WHERE payment_date IS NOT NULL
+//     GROUP BY DATE(payment_date)
+//     ORDER BY DATE(payment_date) ASC
+//     LIMIT 7
+//   """);
+// }
+
+// ======================================================
+// WEEKLY COLLECTION TREND
+// ======================================================
+
+Future<List<Map<String, dynamic>>> weeklyCollectionTrend() async {
+  final db = await DatabaseHelper.database;
+
+  return await db.rawQuery("""
+    SELECT
+      strftime('%W', payment_date) AS label,
+      SUM(amount) AS amount
+    FROM loan_payments
+    WHERE payment_date IS NOT NULL
+    GROUP BY strftime('%W', payment_date)
+    ORDER BY strftime('%W', payment_date) ASC
+    LIMIT 12
+  """);
+}
+
+// ======================================================
+// MONTHLY COLLECTION TREND
+// ======================================================
+
+Future<List<Map<String, dynamic>>> monthlyCollectionTrend() async {
+  final db = await DatabaseHelper.database;
+
+  return await db.rawQuery("""
+    SELECT
+      strftime('%m', payment_date) AS label,
+      SUM(amount) AS amount
+    FROM loan_payments
+    WHERE payment_date IS NOT NULL
+    GROUP BY strftime('%m', payment_date)
+    ORDER BY strftime('%m', payment_date) ASC
+  """);
+}
+
+// ======================================================
+// YEARLY COLLECTION TREND
+// ======================================================
+
+Future<List<Map<String, dynamic>>> yearlyCollectionTrend() async {
+  final db = await DatabaseHelper.database;
+
+  return await db.rawQuery("""
+    SELECT
+      strftime('%Y', payment_date) AS label,
+      SUM(amount) AS amount
+    FROM loan_payments
+    WHERE payment_date IS NOT NULL
+    GROUP BY strftime('%Y', payment_date)
+    ORDER BY strftime('%Y', payment_date) ASC
+  """);
+}
+
+
+
 }
