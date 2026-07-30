@@ -1,6 +1,5 @@
 import 'package:creafton_financial_services/database/database_helper.dart';
 
-
 /// A single row in the "recent payments" feed.
 class RecentPayment {
   final String borrowerName;
@@ -52,6 +51,27 @@ class RecentBorrower {
   });
 }
 
+/// A borrower with a payment due today that has not been marked PAID.
+class TodayDefaulter {
+  final int loanId;
+  final String borrowerName;
+  final String phone;
+  final String? district;
+  final String loanNumber;
+  final double amountDue;
+  final String? dueDate;
+
+  TodayDefaulter({
+    required this.loanId,
+    required this.borrowerName,
+    required this.phone,
+    required this.district,
+    required this.loanNumber,
+    required this.amountDue,
+    required this.dueDate,
+  });
+}
+
 /// Aggregated snapshot of everything the dashboard needs to render.
 class DashboardStats {
   final String businessName;
@@ -81,6 +101,7 @@ class DashboardStats {
   final List<RecentPayment> recentPayments;
   final List<OfficerPerformance> topOfficers;
   final List<RecentBorrower> recentBorrowers;
+  final List<TodayDefaulter> todayDefaulters;
 
   DashboardStats({
     required this.businessName,
@@ -103,6 +124,7 @@ class DashboardStats {
     required this.recentPayments,
     required this.topOfficers,
     required this.recentBorrowers,
+    required this.todayDefaulters,
   });
 
   /// Net cash position for the month (collections - expenses).
@@ -113,6 +135,10 @@ class DashboardStats {
     if (totalDisbursed <= 0) return 0;
     return (collectedAllTime / totalDisbursed).clamp(0, 1) * 100;
   }
+
+  /// Total amount still owed for today across everyone who hasn't paid.
+  double get totalUnpaidToday =>
+      todayDefaulters.fold<double>(0, (sum, d) => sum + d.amountDue);
 }
 
 class DashboardRepository {
@@ -123,7 +149,7 @@ class DashboardRepository {
     final businessRow = await db.query('business_settings', limit: 1);
     final businessName = businessRow.isNotEmpty
         ? (businessRow.first['business_name'] as String?) ?? 'My Business'
-        : 'My Business';
+        : 'Creafton Financial Services';
     final currency = businessRow.isNotEmpty
         ? (businessRow.first['currency'] as String?) ?? 'UGX'
         : 'UGX';
@@ -202,6 +228,28 @@ class DashboardRepository {
       LIMIT 5
     ''');
 
+    // Anyone with a scheduled installment due today on an active loan that
+    // has not been marked PAID. One row per loan (a loan shouldn't have two
+    // rows due the same day, but MIN() guards against it if it ever does).
+    final todayDefaulterRows = await db.rawQuery('''
+      SELECT
+        l.id AS loan_id,
+        l.loan_number,
+        COALESCE(lp.amount, l.daily_payment_amount) AS amount_due,
+        lp.due_date,
+        b.full_name,
+        b.phone,
+        b.district
+      FROM loans l
+      JOIN borrowers b ON b.id = l.borrower_id
+      JOIN loan_payments lp ON lp.loan_id = l.id
+      WHERE l.status = 'ACTIVE'
+        AND date(lp.due_date) = date('now', 'localtime')
+        AND (lp.status IS NULL OR lp.status != 'PAID')
+      GROUP BY l.id
+      ORDER BY b.full_name
+    ''');
+
     double asDouble(Object? v) => (v as num?)?.toDouble() ?? 0.0;
     int asInt(Object? v) => (v as num?)?.toInt() ?? 0;
 
@@ -229,31 +277,50 @@ class DashboardRepository {
       activeFieldOfficers: asInt(officerRow.first['active']),
       loanStatusBreakdown: loanStatusBreakdown,
       recentPayments: recentPaymentRows
-          .map((r) => RecentPayment(
-                borrowerName: r['full_name'] as String? ?? '—',
-                loanNumber: r['loan_number'] as String? ?? '—',
-                amount: asDouble(r['amount']),
-                paymentDate: r['payment_date'] as String?,
-                status: r['status'] as String? ?? 'PENDING',
-              ))
+          .map(
+            (r) => RecentPayment(
+              borrowerName: r['full_name'] as String? ?? '—',
+              loanNumber: r['loan_number'] as String? ?? '—',
+              amount: asDouble(r['amount']),
+              paymentDate: r['payment_date'] as String?,
+              status: r['status'] as String? ?? 'PENDING',
+            ),
+          )
           .toList(),
       topOfficers: topOfficerRows
-          .map((r) => OfficerPerformance(
-                fullName: r['full_name'] as String? ?? '—',
-                totalCollected: asDouble(r['total_collected']),
-                recoveryRate: asDouble(r['recovery_rate']),
-                activeLoans: asInt(r['active_loans']),
-                performanceScore: asDouble(r['performance_score']),
-              ))
+          .map(
+            (r) => OfficerPerformance(
+              fullName: r['full_name'] as String? ?? '—',
+              totalCollected: asDouble(r['total_collected']),
+              recoveryRate: asDouble(r['recovery_rate']),
+              activeLoans: asInt(r['active_loans']),
+              performanceScore: asDouble(r['performance_score']),
+            ),
+          )
           .toList(),
       recentBorrowers: recentBorrowerRows
-          .map((r) => RecentBorrower(
-                fullName: r['full_name'] as String? ?? '—',
-                borrowerNumber: r['borrower_number'] as String? ?? '—',
-                phone: r['phone'] as String? ?? '—',
-                createdAt: r['created_at'] as String?,
-                status: r['status'] as String? ?? 'ACTIVE',
-              ))
+          .map(
+            (r) => RecentBorrower(
+              fullName: r['full_name'] as String? ?? '—',
+              borrowerNumber: r['borrower_number'] as String? ?? '—',
+              phone: r['phone'] as String? ?? '—',
+              createdAt: r['created_at'] as String?,
+              status: r['status'] as String? ?? 'ACTIVE',
+            ),
+          )
+          .toList(),
+      todayDefaulters: todayDefaulterRows
+          .map(
+            (r) => TodayDefaulter(
+              loanId: asInt(r['loan_id']),
+              borrowerName: r['full_name'] as String? ?? '—',
+              phone: r['phone'] as String? ?? '—',
+              district: r['district'] as String?,
+              loanNumber: r['loan_number'] as String? ?? '—',
+              amountDue: asDouble(r['amount_due']),
+              dueDate: r['due_date'] as String?,
+            ),
+          )
           .toList(),
     );
   }

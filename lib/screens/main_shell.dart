@@ -5,6 +5,7 @@ import 'package:creafton_financial_services/screens/reports/expenditure_reports_
 // import 'package:creafton_financial_services/screens/reports/report/financial_reports_screen.dart';
 import 'package:creafton_financial_services/screens/reports/report/reports_screen.dart';
 import 'package:creafton_financial_services/screens/reports/reports_dashboard_screen.dart';
+import 'package:creafton_financial_services/screens/users/manage_user.dart';
 // import 'package:creafton_financial_services/screens/guarantors/main_guarantors_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -50,8 +51,8 @@ class _MainShellState extends State<MainShell> {
 
           break;
 
-        // case "Loans":
-        // _selectedPage = const Center(child: Text("Loans Module"));
+        
+          
 
         // break;
 
@@ -60,20 +61,25 @@ class _MainShellState extends State<MainShell> {
 
           break;
 
-        case "Expenditures Reports":
-          _selectedPage = ExpenditureReportsScreen();
+        // case "Expenditures Reports":
+        //   _selectedPage = ExpenditureReportsScreen();
 
-          break;
+        //   break;
 
         case "Reports":
           _selectedPage = const ReportsScreen();
 
           break;
 
-        case "Settings":
-          _selectedPage = const Center(child: Text("Settings Module"));
+          case "Users":
+          _selectedPage = ManageUsersScreen();
 
           break;
+
+        // case "Settings":
+        //   _selectedPage = const Center(child: Text("Settings Module"));
+
+        //   break;
       }
     });
   }

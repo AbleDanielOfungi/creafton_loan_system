@@ -65,6 +65,9 @@ class Sidebar extends StatelessWidget {
                 _menu(Icons.payment, "Expenditures"),
 
                 _menu(Icons.bar_chart, "Reports"),
+                
+                _menu(Icons.person, "Users"),
+                
               ],
             ),
           ),

@@ -8,6 +8,7 @@ import 'package:creafton_financial_services/providers/loan_provider.dart';
 import 'package:creafton_financial_services/providers/payment_provder.dart';
 import 'package:creafton_financial_services/providers/payment_schedule_provider.dart';
 import 'package:creafton_financial_services/providers/reports_provider.dart';
+import 'package:creafton_financial_services/providers/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -41,7 +42,7 @@ class CreaftonApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => GuarantorProvider()),
         ChangeNotifierProvider(create: (_) => ExpenditureCategoryProvider()),
         ChangeNotifierProvider(create: (_) => ExpenditureProvider()),
-        // ChangeNotifierProvider(create: (_) => ReportsProvider()),
+        ChangeNotifierProvider(create: (_) => UserProvider()),
 
         // ChangeNotifierProvider(create: (_) => ExpenditureProvider()),
       ],

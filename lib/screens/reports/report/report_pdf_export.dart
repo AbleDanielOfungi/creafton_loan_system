@@ -45,13 +45,21 @@ class ReportPdfExporter {
         build: (context) => [
           pw.SizedBox(height: 12),
           _summaryGrid(labelStyle, valueStyle, [
+            // ('New Borrowers', '${summary.newBorrowers}'),
+            // ('New Loans', '${summary.newLoans}'),
+            // ('Disbursed', _money(summary.totalDisbursed)),
+            // ('Collected', _money(summary.totalCollected)),
+            // ('Expenditure', _money(summary.totalExpenditure)),
+            // ('Net Cash Flow', _money(summary.netCashFlow)),
+            // ('Active Loans (all time)', '${summary.activeLoansAllTime}'),
             ('New Borrowers', '${summary.newBorrowers}'),
             ('New Loans', '${summary.newLoans}'),
-            ('Disbursed', _money(summary.totalDisbursed)),
-            ('Collected', _money(summary.totalCollected)),
-            ('Expenditure', _money(summary.totalExpenditure)),
-            ('Net Cash Flow', _money(summary.netCashFlow)),
+            ('Cash Out', _money(summary.totalDisbursed)),
+            ('Cash In', _money(summary.totalCollected)),
+            ('Expenses', _money(summary.totalExpenditure)),
+            ('Closing Balance', _money(summary.netCashFlow)),
             ('Active Loans (all time)', '${summary.activeLoansAllTime}'),
+
             (
               'Outstanding (all time)',
               _money(summary.outstandingBalanceAllTime),

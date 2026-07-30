@@ -502,92 +502,58 @@ class _BorrowersScreenState extends State<BorrowersScreen> {
           mainAxisSize: MainAxisSize.min,
 
           children: [
-            ListTile(
-              leading: const Icon(Icons.account_circle),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: Row(
+                children: [
+                  const Text("Edit Borrower"),
 
-              title: const Text("View Profile"),
-
-              onTap: () {
-                Navigator.pop(context);
-
-                Navigator.push(
-                  context,
-
-                  MaterialPageRoute(
-                    builder: (_) => BorrowerProfileScreen(borrower: borrower),
-                  ),
-                );
-              },
-            ),
-
-            ListTile(
-              leading: const Icon(Icons.money),
-
-              title: const Text("Create Loan"),
-
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-
-            ListTile(
-              leading: const Icon(Icons.payment),
-
-              title: const Text("Record Payment"),
-
-              onTap: () {
-                Navigator.pop(context);
-              },
-            ),
-
-            ListTile(
-              leading: const Icon(Icons.edit),
-
-              title: const Text("Edit Borrower"),
-
-              onTap: () {
-                Navigator.push(
-                  context,
-
-                  MaterialPageRoute(
-                    builder: (_) => BorrowerProfileScreen(borrower: borrower),
-                  ),
-                );
-              },
-            ),
-
-            IconButton(
-              icon: const Icon(
-                Icons.edit_outlined,
-                color: AppColors.primaryBlue,
-              ),
-              tooltip: "Edit Borrower",
-              onPressed: () async {
-                final updated = await Navigator.push<bool>(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => EditBorrowerScreen(borrower: borrower),
-                  ),
-                );
-
-                if (updated == true && context.mounted) {
-                  await context.read<BorrowerProvider>().loadBorrowers();
-
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text("Borrower updated successfully"),
-                      backgroundColor: Colors.green,
+                  IconButton(
+                    icon: const Icon(
+                      Icons.edit_outlined,
+                      color: AppColors.primaryBlue,
                     ),
-                  );
-                }
-              },
+                    tooltip: "Edit Borrower",
+                    onPressed: () async {
+                      final updated = await Navigator.push<bool>(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) =>
+                              EditBorrowerScreen(borrower: borrower),
+                        ),
+                      );
+
+                      if (updated == true && context.mounted) {
+                        await context.read<BorrowerProvider>().loadBorrowers();
+
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("Borrower updated successfully"),
+                            backgroundColor: Colors.green,
+                          ),
+                        );
+                      }
+                    },
+                  ),
+                ],
+              ),
             ),
 
-            IconButton(
-              icon: const Icon(Icons.delete_outline, color: Colors.red),
-              onPressed: () {
-                _showDeleteDialog(borrower);
-              },
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0),
+              child: Row(
+                children: [
+                  const Text("Delete Borrower"),
+
+                  IconButton(
+                    icon: const Icon(Icons.delete_outline, color: Colors.red),
+                    tooltip: "Delete Borrower",
+                    onPressed: () async {
+                      _showDeleteDialog(borrower);
+                    },
+                  ),
+                ],
+              ),
             ),
           ],
         );
